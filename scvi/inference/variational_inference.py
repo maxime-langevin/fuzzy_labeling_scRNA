@@ -328,6 +328,39 @@ class JointSemiSupervisedVariationalInference(SemiSupervisedVariationalInference
         return loss
 
 
+class JointSemiSupervisedVariationalInferenceUncertain(SemiSupervisedVariationalInference):
+    r"""The JointSemiSupervisedVariationalInference class for the semi-supervised training of an autoencoder.
+
+    Args:
+        :model: A model instance from class ``VAEC``, ``SVAEC``, ...
+        :gene_dataset: A gene_dataset instance with pre-annotations like ``CortexDataset()``
+        :n_labelled_samples_per_class: The number of labelled training samples per class. Default: ``50``.
+        :**kwargs: Other keywords arguments from the general Inference class.
+
+    Examples:
+        >>> gene_dataset = CortexDataset()
+        >>> svaec = SVAEC(gene_dataset.nb_genes, n_batch=gene_dataset.n_batches * False,
+        ... n_labels=gene_dataset.n_labels)
+
+        >>> infer = JointSemiSupervisedVariationalInference(gene_dataset, svaec, n_labelled_samples_per_class=10)
+        >>> infer.train(n_epochs=20, lr=1e-3)
+    """
+
+    def __init__(self, model, gene_dataset, n_labelled_samples_per_class=50, n_label_array=None,classification_ratio=[1, 1], **kwargs):
+        super(JointSemiSupervisedVariationalInferenceUncertain, self).__init__(model, gene_dataset, **kwargs)
+        self.data_loaders = JointSemiSupervisedDataLoaders(gene_dataset, n_labelled_samples_per_class, n_label_array,
+                                                           use_cuda=self.use_cuda)
+        self.classification_ratio = classification_ratio
+
+    def loss(self, tensors_all, tensors_labelled):
+        loss = super(JointSemiSupervisedVariationalInferenceUncertain, self).loss(tensors_all)
+        sample_batch,_, _,_, y = tensors_labelled
+        classification_loss_1 = torch.sum((self.model.classify(sample_batch)[:, 1]) * y.type(torch.FloatTensor))
+        classification_loss_0 = torch.sum((self.model.classify(sample_batch)[:, 0]) * (1-y).type(torch.FloatTensor))
+        loss -= (classification_loss_0 * self.classification_ratio[0] + classification_loss_1 * self.classification_ratio[1])
+        return loss
+
+
 class VariationalInferenceFish(VariationalInference):
     r"""The VariationalInference class for the unsupervised training of an autoencoder.
 

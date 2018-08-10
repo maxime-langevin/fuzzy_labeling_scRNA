@@ -12,6 +12,7 @@ from .csv import CsvDataset, BreastCancerDataset, MouseOBDataset
 from .seqfish import SeqfishDataset
 from .smfish import SmfishDataset
 from .data_loaders import DataLoaders
+from .cortexcustom import CortexDatasetCustom
 
 __all__ = ['SyntheticDataset',
            'CortexDataset',
@@ -32,4 +33,5 @@ __all__ = ['SyntheticDataset',
            'BreastCancerDataset',
            'MouseOBDataset',
            'DataLoaders',
-           'PurifiedPBMCDataset']
+           'PurifiedPBMCDataset',
+           'CortexDatasetCustom']

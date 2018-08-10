@@ -4,7 +4,8 @@ from .variational_inference import (
     VariationalInference,
     AlternateSemiSupervisedVariationalInference,
     JointSemiSupervisedVariationalInference,
-    VariationalInferenceFish
+    VariationalInferenceFish,
+    JointSemiSupervisedVariationalInferenceUncertain
 )
 from .experimental_inference import adversarial_wrapper, mmd_wrapper
 
@@ -15,4 +16,5 @@ __all__ = ['Inference',
            'JointSemiSupervisedVariationalInference',
            'VariationalInferenceFish',
            'adversarial_wrapper',
-           'mmd_wrapper']
+           'mmd_wrapper',
+           'JointSemiSupervisedVariationalInferenceUncertain']

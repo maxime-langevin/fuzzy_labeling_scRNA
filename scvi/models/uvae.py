@@ -8,7 +8,7 @@ from scvi.models.utils import broadcast_labels
 from scvi.models.vae import VAE
 
 
-class SVAEC(VAE):
+class UVAE(VAE):
     r"""A semi-supervised Variational auto-encoder model - inspired from M1 + M2 model,
     as described in (https://arxiv.org/pdf/1406.5298.pdf). S stand for "Stacked" variational autoencoder
     and C for classification - SVAEC
@@ -39,7 +39,7 @@ class SVAEC(VAE):
     def __init__(self, n_input, n_batch, n_labels, n_hidden=128, n_latent=10, n_layers=1, dropout_rate=0.1,
                  y_prior=None, logreg_classifier=False, dispersion="gene", log_variational=True,
                  reconstruction_loss="zinb", labels_groups=None, use_labels_groups=False):
-        super(SVAEC, self).__init__(n_input, n_hidden=n_hidden, n_latent=n_latent, n_layers=n_layers,
+        super(UVAE, self).__init__(n_input, n_hidden=n_hidden, n_latent=n_latent, n_layers=n_layers,
                                     dropout_rate=dropout_rate, n_batch=n_batch, dispersion=dispersion,
                                     log_variational=log_variational, reconstruction_loss=reconstruction_loss)
 
@@ -86,14 +86,14 @@ class SVAEC(VAE):
         return w_y
 
     def get_latents(self, x, y=None):
-        zs = super(SVAEC, self).get_latents(x)
+        zs = super(UVAE, self).get_latents(x)
         qz2_m, qz2_v, z2 = self.encoder_z2_z1(zs[0], y)
         if not self.training:
             z2 = qz2_m
         return [zs[0], z2]
 
     def forward(self, x, local_l_mean, local_l_var, batch_index=None, y=None):
-        # y = None
+        y = None
         is_labelled = False if y is None else True
 
         x_ = torch.log(1 + x)
